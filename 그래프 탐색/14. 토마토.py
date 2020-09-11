@@ -142,7 +142,8 @@ def bfs() :
 
     while q :
         x, y, z, ans = q.popleft()
-        answer = max(answer, ans)
+        # answer = max(answer, ans) -> 이렇게 해줄 필요가 없다
+        answer = ans
 
         for i in range(6) :
             nx = x + dx[i]
@@ -188,4 +189,57 @@ else :
     print(-1)
 
 # 드디어 맞음
-# 5. 검토 및 개선
+
+
+# 4. 검토 및 개선
+# dp를 다른 방식으로 구현할 수도 있다 -> check에 일 수를 저장하는 방식
+from collections import deque
+import sys
+
+dx = [1, -1, 0, 0, 0, 0]
+dy = [0, 0, 1, -1, 0, 0]
+dz = [0, 0, 0, 0, 1, -1]
+
+
+def bfs() :
+    while q :
+        x, y, z = q.popleft()
+
+        for i in range(6) :
+            nx = x + dx[i]
+            ny = y + dy[i]
+            nz = z + dz[i]
+
+            if 0 <= nx < h and 0 <= ny < n and 0 <= nz < m :
+                if dp[nx][ny][nz] == 0 and arr[nx][ny][nz] == 0 :
+                    arr[nx][ny][nz] = 1
+                    dp[nx][ny][nz] = dp[x][y][z] + 1
+                    q.append((nx, ny, nz))
+
+
+m, n, h = map(int, input().split())
+arr = [[list(map(int, input().split())) for _ in range(n)] for _ in range(h)]
+dp = [[[0] * m for _ in range(n)] for _ in range(h)]
+
+q = deque()
+for i in range(h) :
+    for j in range(n) :
+        for k in range(m) :
+            if dp[i][j][k] == 0 and arr[i][j][k] == 1 :
+                dp[i][j][k] = 1
+                q.append((i, j, k))
+bfs()
+
+for i in arr : # 3차원 배열 arr
+    for j in i : # 2차원 배열 i
+        if 0 in j : # 1차원 배열 j 에 0이 있으면
+            print(-1)
+            sys.exit()
+
+answer = 0
+for i in dp :
+    for j in i :
+        max_val = max(j)
+        answer = max(answer, max_val)
+
+print(answer - 1)
